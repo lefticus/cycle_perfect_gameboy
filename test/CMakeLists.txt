@@ -33,6 +33,7 @@ set_tests_properties(cli.version_matches PROPERTIES PASS_REGULAR_EXPRESSION "${P
 add_executable(tests 
   tests.cpp
   core_types_test.cpp
+  integration_blargg_test.cpp
 )
 target_link_libraries(
   tests

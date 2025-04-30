@@ -2,6 +2,7 @@
 #define CYCLE_PERFECT_GAMEBOY_SYSTEM_GAMEBOY_HPP
 
 #include <memory>
+#include <queue>
 #include <string>
 
 #include <cycle_perfect_gameboy/core/types.hpp>
@@ -9,8 +10,14 @@
 #include <cycle_perfect_gameboy/memory/ram.hpp>
 #include <cycle_perfect_gameboy/cpu/cpu.hpp>
 #include <cycle_perfect_gameboy/cartridge/rom.hpp>
+#include <cycle_perfect_gameboy/system/timer.hpp>
+#include <cycle_perfect_gameboy/system/interrupt_controller.hpp>
 
 namespace cycle_perfect_gameboy::system {
+
+// Serial port addresses
+constexpr core::Address SB_ADDR{0xFF01}; // Serial transfer data
+constexpr core::Address SC_ADDR{0xFF02}; // Serial transfer control
 
 class GameBoy {
 private:
@@ -24,15 +31,26 @@ private:
   // Cartridge ROM
   std::shared_ptr<cartridge::ROM> cartridge_{std::make_shared<cartridge::ROM>()};
   
+  // System components
+  std::unique_ptr<InterruptController> interrupt_controller_;
+  std::unique_ptr<Timer> timer_;
+  
   // CPU
   cpu::CPU cpu_{memory_map_, memory_map_};
   
   // System state
   bool powered_on_{false};
+  
+  // Serial port
+  std::queue<std::uint8_t> serial_buffer_{};
 
 public:
   GameBoy() {
     initialize_memory_map();
+    
+    // Initialize system components
+    interrupt_controller_ = std::make_unique<InterruptController>(memory_map_);
+    timer_ = std::make_unique<Timer>(memory_map_);
   }
   
   constexpr void initialize_memory_map() {
@@ -76,7 +94,11 @@ public:
   
   void power_on() {
     if (!powered_on_) {
+      // Initialize all components
       cpu_.initialize();
+      interrupt_controller_->initialize();
+      timer_->initialize();
+      
       powered_on_ = true;
     }
   }
@@ -84,6 +106,10 @@ public:
   void reset() {
     // Reset CPU
     cpu_.initialize();
+    
+    // Reset system components
+    interrupt_controller_->initialize();
+    timer_->initialize();
     
     // Reset memory (except cartridge)
     vram_ = memory::RAM<0x8000>{};
@@ -102,15 +128,45 @@ public:
     // For now, we'll just run a fixed number of cycles that approximates one frame
     // Later, we'll synchronize this with the PPU
     constexpr std::uint32_t cycles_per_frame = 70224; // Cycles per frame at 59.7 fps
-    cpu_.run(cycles_per_frame);
+    run_for_cycles(cycles_per_frame);
   }
   
-  void run_for_cycles(std::uint32_t cycles) {
+  void run_for_cycles(std::uint32_t total_cycles) {
     if (!powered_on_) {
       return;
     }
     
-    cpu_.run(cycles);
+    std::uint32_t cycles_executed = 0;
+    while (cycles_executed < total_cycles) {
+      // Execute a single instruction
+      const auto cycles = cpu_.execute_instruction();
+      const auto cycle_count = cycles.value();
+      
+      // Update timer
+      timer_->update(cycles);
+      
+      // Additional components like PPU would be updated here
+      
+      cycles_executed += cycle_count;
+    }
+  }
+  
+  // Special memory access handlers for memory-mapped I/O
+  void handle_memory_write(core::Address addr, std::uint8_t value) {
+    const auto addr_value = addr.value();
+    
+    // Handle divider register reset
+    if (addr_value == DIV_ADDR.value()) {
+      timer_->reset_div();
+    }
+    
+    // Handle timer control updates
+    else if (addr_value == TAC_ADDR.value()) {
+      const auto old_tac = memory_map_.read(TAC_ADDR);
+      timer_->tac_updated(old_tac, value);
+    }
+    
+    // Other memory-mapped hardware would be handled here
   }
   
   [[nodiscard]] constexpr auto get_cpu() const -> const cpu::CPU& {
@@ -121,8 +177,74 @@ public:
     return *cartridge_;
   }
   
+  [[nodiscard]] constexpr auto get_timer() const -> const Timer& {
+    return *timer_;
+  }
+  
+  [[nodiscard]] constexpr auto get_interrupt_controller() const -> const InterruptController& {
+    return *interrupt_controller_;
+  }
+  
   [[nodiscard]] constexpr auto is_powered_on() const -> bool {
     return powered_on_;
+  }
+  
+  // Step a single machine cycle
+  auto step() -> core::Cycles {
+    if (!powered_on_) {
+      return core::Cycles{4}; // Return a default cycle count
+    }
+    
+    // Execute a single instruction
+    const auto cycles = cpu_.execute_instruction();
+    
+    // Update timer
+    timer_->update(cycles);
+    
+    // Handle serial transfer
+    handle_serial_transfer();
+    
+    return cycles;
+  }
+  
+  // Serial port handling
+  void handle_serial_transfer() {
+    const auto sc_value = memory_map_.read(SC_ADDR);
+    
+    // Check if a transfer has been requested (bit 7 set)
+    if (sc_value & 0x80) {
+      // Read serial data and add to buffer
+      const auto data = memory_map_.read(SB_ADDR);
+      serial_buffer_.push(data);
+      
+      // Reset transfer flag to indicate completion
+      memory_map_.write(SC_ADDR, sc_value & ~0x80);
+    }
+  }
+  
+  // Check if serial data is available
+  [[nodiscard]] bool serial_data_available() const {
+    return !serial_buffer_.empty();
+  }
+  
+  // Read serial data from buffer
+  std::uint8_t read_serial_data() {
+    if (serial_buffer_.empty()) {
+      return 0;
+    }
+    
+    const auto data = serial_buffer_.front();
+    serial_buffer_.pop();
+    return data;
+  }
+  
+  // Constructor that takes a ROM
+  explicit GameBoy(cartridge::ROM rom) : cartridge_{std::make_shared<cartridge::ROM>(std::move(rom))} {
+    initialize_memory_map();
+    
+    // Initialize system components
+    interrupt_controller_ = std::make_unique<InterruptController>(memory_map_);
+    timer_ = std::make_unique<Timer>(memory_map_);
   }
 };
 

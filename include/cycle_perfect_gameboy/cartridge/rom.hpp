@@ -2,10 +2,12 @@
 #define CYCLE_PERFECT_GAMEBOY_CARTRIDGE_ROM_HPP
 
 #include <cstdint>
-#include <vector>
-#include <memory>
-#include <string>
+#include <filesystem>
 #include <fstream>
+#include <memory>
+#include <optional>
+#include <string>
+#include <vector>
 
 #include <cycle_perfect_gameboy/core/types.hpp>
 #include <cycle_perfect_gameboy/memory/memory_interface.hpp>
@@ -68,6 +70,15 @@ public:
   
   [[nodiscard]] constexpr auto get_size() const -> std::size_t {
     return data_.size();
+  }
+  
+  // Static factory method to create ROM from file
+  [[nodiscard]] static auto from_file(const std::filesystem::path& path) -> std::optional<ROM> {
+    ROM rom;
+    if (rom.load_from_file(path.string())) {
+      return std::make_optional(std::move(rom));
+    }
+    return std::nullopt;
   }
 };
 
