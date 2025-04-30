@@ -1,5 +1,5 @@
 # Enable cache if available
-function(myproject_enable_cache)
+function(cycle_perfect_gameboy_enable_cache)
   set(CACHE_OPTION
       "ccache"
       CACHE STRING "Compiler cache to be used")
@@ -28,6 +28,6 @@ function(myproject_enable_cache)
         ${CACHE_BINARY}
         CACHE FILEPATH "C compiler cache used")
   else()
-    message(${myproject_WARNING_TYPE} "${CACHE_OPTION} is enabled but was not found. Not using it")
+    message(${cycle_perfect_gameboy_WARNING_TYPE} "${CACHE_OPTION} is enabled but was not found. Not using it")
   endif()
 endfunction()

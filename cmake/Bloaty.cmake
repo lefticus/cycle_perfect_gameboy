@@ -1,7 +1,7 @@
 # Bloaty McBloatface - A binary size analyzer
 # This module enables Bloaty for analyzing executable and library sizes
 
-function(myproject_setup_bloaty TARGET_NAME)
+function(cycle_perfect_gameboy_setup_bloaty TARGET_NAME)
   find_program(BLOATY bloaty)
   if(BLOATY)
     # Define output directory
@@ -57,12 +57,12 @@ function(myproject_setup_bloaty TARGET_NAME)
     
     message(STATUS "Bloaty McBloatface targets created for ${TARGET_NAME}")
   else()
-    message(${myproject_WARNING_TYPE} "Bloaty McBloatface requested but executable not found. Install with 'apt install bloaty' or from https://github.com/google/bloaty")
+    message(${cycle_perfect_gameboy_WARNING_TYPE} "Bloaty McBloatface requested but executable not found. Install with 'apt install bloaty' or from https://github.com/google/bloaty")
   endif()
 endfunction()
 
 # Function to add bloaty analysis to all executable targets
-function(myproject_enable_bloaty)
+function(cycle_perfect_gameboy_enable_bloaty)
   find_program(BLOATY bloaty)
   if(BLOATY)
     # Get all executable targets
@@ -73,13 +73,13 @@ function(myproject_enable_bloaty)
     
     # Create individual bloaty targets for each executable
     foreach(TARGET_NAME ${ALL_TARGETS})
-      myproject_setup_bloaty(${TARGET_NAME})
+      cycle_perfect_gameboy_setup_bloaty(${TARGET_NAME})
       add_dependencies(bloaty_all bloaty_${TARGET_NAME})
     endforeach()
     
     message(STATUS "Bloaty McBloatface enabled for all executable targets")
   else()
-    message(${myproject_WARNING_TYPE} "Bloaty McBloatface requested but executable not found. Install with 'apt install bloaty' or from https://github.com/google/bloaty")
+    message(${cycle_perfect_gameboy_WARNING_TYPE} "Bloaty McBloatface requested but executable not found. Install with 'apt install bloaty' or from https://github.com/google/bloaty")
   endif()
 endfunction()
 

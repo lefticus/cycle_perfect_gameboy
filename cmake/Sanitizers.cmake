@@ -1,5 +1,5 @@
 function(
-  myproject_enable_sanitizers
+  cycle_perfect_gameboy_enable_sanitizers
   project_name
   ENABLE_SANITIZER_ADDRESS
   ENABLE_SANITIZER_LEAK
@@ -24,7 +24,7 @@ function(
 
     if(${ENABLE_SANITIZER_THREAD})
       if("address" IN_LIST SANITIZERS OR "leak" IN_LIST SANITIZERS)
-        message(${myproject_WARNING_TYPE} "Thread sanitizer does not work with Address and Leak sanitizer enabled")
+        message(${cycle_perfect_gameboy_WARNING_TYPE} "Thread sanitizer does not work with Address and Leak sanitizer enabled")
       else()
         list(APPEND SANITIZERS "thread")
       endif()
@@ -32,13 +32,13 @@ function(
 
     if(${ENABLE_SANITIZER_MEMORY} AND CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
       message(
-        ${myproject_WARNING_TYPE}
+        ${cycle_perfect_gameboy_WARNING_TYPE}
           "Memory sanitizer requires all the code (including libc++) to be MSan-instrumented otherwise it reports false positives"
       )
       if("address" IN_LIST SANITIZERS
          OR "thread" IN_LIST SANITIZERS
          OR "leak" IN_LIST SANITIZERS)
-        message(${myproject_WARNING_TYPE} "Memory sanitizer does not work with Address, Thread or Leak sanitizer enabled")
+        message(${cycle_perfect_gameboy_WARNING_TYPE} "Memory sanitizer does not work with Address, Thread or Leak sanitizer enabled")
       else()
         list(APPEND SANITIZERS "memory")
       endif()
@@ -51,7 +51,7 @@ function(
        OR ${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}
        OR ${ENABLE_SANITIZER_THREAD}
        OR ${ENABLE_SANITIZER_MEMORY})
-      message(${myproject_WARNING_TYPE} "MSVC only supports address sanitizer")
+      message(${cycle_perfect_gameboy_WARNING_TYPE} "MSVC only supports address sanitizer")
     endif()
   endif()
 

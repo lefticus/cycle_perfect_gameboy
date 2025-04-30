@@ -1,7 +1,7 @@
 # Lizard - A cyclomatic complexity analyzer
 # This module enables Lizard for analyzing code complexity
 
-function(myproject_setup_lizard WARNINGS_AS_ERRORS)
+function(cycle_perfect_gameboy_setup_lizard WARNINGS_AS_ERRORS)
   find_program(LIZARD lizard)
   if(LIZARD)
     # Define thresholds
@@ -73,6 +73,6 @@ function(myproject_setup_lizard WARNINGS_AS_ERRORS)
       \n  Parameter Count: ${LIZARD_PARAM_THRESHOLD} \
       \n  Warnings Threshold: ${LIZARD_WARNINGS_THRESHOLD}")
   else()
-    message(${myproject_WARNING_TYPE} "Lizard requested but executable not found. Install with 'pip install lizard'")
+    message(${cycle_perfect_gameboy_WARNING_TYPE} "Lizard requested but executable not found. Install with 'pip install lizard'")
   endif()
 endfunction()

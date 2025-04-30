@@ -16,29 +16,29 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Set the project name and language
 project(
-  myproject
+  cycle_perfect_gameboy
   VERSION 0.0.1
   DESCRIPTION ""
-  HOMEPAGE_URL "%%myurl%%"
+  HOMEPAGE_URL "https://github.com/lefticus/cycle_perfect_gameboy"
   LANGUAGES CXX C)
 
 include(cmake/PreventInSourceBuilds.cmake)
 include(ProjectOptions.cmake)
 
 
-myproject_setup_options()
+cycle_perfect_gameboy_setup_options()
 
-if (myproject_WARNINGS_AS_ERRORS)
-  set(myproject_WARNING_TYPE SEND_ERROR)
+if (cycle_perfect_gameboy_WARNINGS_AS_ERRORS)
+  set(cycle_perfect_gameboy_WARNING_TYPE SEND_ERROR)
 else()
-  set(myproject_WARNING_TYPE WARNING)
+  set(cycle_perfect_gameboy_WARNING_TYPE WARNING)
 endif()
 
-myproject_global_options()
+cycle_perfect_gameboy_global_options()
 include(Dependencies.cmake)
-myproject_setup_dependencies()
+cycle_perfect_gameboy_setup_dependencies()
 
-myproject_local_options()
+cycle_perfect_gameboy_local_options()
 
 # don't know if this should be set globally from here or not...
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
@@ -52,13 +52,13 @@ string(
             8
             GIT_SHORT_SHA)
 
-target_compile_features(myproject_options INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
+target_compile_features(cycle_perfect_gameboy_options INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
 
-add_library(myproject::myproject_options ALIAS myproject_options)
-add_library(myproject::myproject_warnings ALIAS myproject_warnings)
+add_library(cycle_perfect_gameboy::cycle_perfect_gameboy_options ALIAS cycle_perfect_gameboy_options)
+add_library(cycle_perfect_gameboy::cycle_perfect_gameboy_warnings ALIAS cycle_perfect_gameboy_warnings)
 
-#add_library(myproject::myproject_options INTERFACE IMPORTED)
-#add_library(myproject::myproject_warnings INTERFACE IMPORTED)
+#add_library(cycle_perfect_gameboy::cycle_perfect_gameboy_options INTERFACE IMPORTED)
+#add_library(cycle_perfect_gameboy::cycle_perfect_gameboy_warnings INTERFACE IMPORTED)
 
 # configure files based on CMake configuration options
 add_subdirectory(configured_files)
@@ -80,9 +80,9 @@ if(BUILD_TESTING)
 endif()
 
 
-if(myproject_BUILD_FUZZ_TESTS)
+if(cycle_perfect_gameboy_BUILD_FUZZ_TESTS)
   message(AUTHOR_WARNING "Building Fuzz Tests, using fuzzing sanitizer https://www.llvm.org/docs/LibFuzzer.html")
-  if (NOT myproject_ENABLE_SANITIZER_ADDRESS AND NOT myproject_ENABLE_SANITIZER_THREAD)
+  if (NOT cycle_perfect_gameboy_ENABLE_SANITIZER_ADDRESS AND NOT cycle_perfect_gameboy_ENABLE_SANITIZER_THREAD)
     message(WARNING "You need asan or tsan enabled for meaningful fuzz testing")
   endif()
   add_subdirectory(fuzz_test)
@@ -108,11 +108,11 @@ include(cmake/PackageProject.cmake)
 
 # Add other targets that you want installed here, by default we just package the one executable
 # we know we want to ship
-myproject_package_project(
+cycle_perfect_gameboy_package_project(
   TARGETS
   intro
-  myproject_options
-  myproject_warnings
+  cycle_perfect_gameboy_options
+  cycle_perfect_gameboy_warnings
   # FIXME: this does not work! CK
   # PRIVATE_DEPENDENCIES_CONFIGURED project_options project_warnings
 )
