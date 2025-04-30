@@ -29,12 +29,17 @@ add_test(NAME cli.has_help COMMAND intro --help)
 add_test(NAME cli.version_matches COMMAND intro --version)
 set_tests_properties(cli.version_matches PROPERTIES PASS_REGULAR_EXPRESSION "${PROJECT_VERSION}")
 
-add_executable(tests tests.cpp)
+# Main test executable with all regular unit tests
+add_executable(tests 
+  tests.cpp
+  core_types_test.cpp
+)
 target_link_libraries(
   tests
   PRIVATE cycle_perfect_gameboy::cycle_perfect_gameboy_warnings
           cycle_perfect_gameboy::cycle_perfect_gameboy_options
           cycle_perfect_gameboy::sample_library
+          cycle_perfect_gameboy::cycle_perfect_gameboy
           Catch2::Catch2WithMain)
 
 if(WIN32 AND BUILD_SHARED_LIBS)
@@ -67,6 +72,7 @@ target_link_libraries(
   PRIVATE cycle_perfect_gameboy::cycle_perfect_gameboy_warnings
           cycle_perfect_gameboy::cycle_perfect_gameboy_options
           cycle_perfect_gameboy::sample_library
+          cycle_perfect_gameboy::cycle_perfect_gameboy
           Catch2::Catch2WithMain)
 
 catch_discover_tests(
@@ -90,6 +96,7 @@ target_link_libraries(
   PRIVATE cycle_perfect_gameboy::cycle_perfect_gameboy_warnings
           cycle_perfect_gameboy::cycle_perfect_gameboy_options
           cycle_perfect_gameboy::sample_library
+          cycle_perfect_gameboy::cycle_perfect_gameboy
           Catch2::Catch2WithMain)
 target_compile_definitions(relaxed_constexpr_tests PRIVATE -DCATCH_CONFIG_RUNTIME_STATIC_REQUIRE)
 

@@ -1,2 +1,4 @@
 add_subdirectory(sample_library)
 add_subdirectory(ftxui_sample)
+add_subdirectory(cycle_perfect_gameboy)
+add_subdirectory(cycle_perfect_gameboy_emu)
