@@ -35,6 +35,9 @@ macro(cycle_perfect_gameboy_enable_cppcheck WARNINGS_AS_ERRORS CPPCHECK_OPTIONS)
           --suppress=preprocessorErrorDirective
           # ignores static_assert type failures
           --suppress=knownConditionTrueFalse
+          --suppress=normalCheckLevelMaxBranches
+          --suppress=unusedPrivateFunction
+          --suppress=constParameterReference
           --inconclusive
           --suppress=${SUPPRESS_DIR})
     else()

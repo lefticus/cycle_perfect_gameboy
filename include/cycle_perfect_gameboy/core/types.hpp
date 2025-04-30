@@ -57,6 +57,7 @@ public:
     : value_{static_cast<std::uint16_t>((static_cast<std::uint16_t>(high.get()) << 8) | low.get())} {}
   
   [[nodiscard]] constexpr auto get() const noexcept -> std::uint16_t { return value_; }
+  [[nodiscard]] constexpr auto value() const noexcept -> std::uint16_t { return value_; }
   constexpr void set(std::uint16_t value) noexcept { value_ = value; }
   
   [[nodiscard]] constexpr auto high() const noexcept -> Register { return Register{static_cast<std::uint8_t>(value_ >> 8)}; }

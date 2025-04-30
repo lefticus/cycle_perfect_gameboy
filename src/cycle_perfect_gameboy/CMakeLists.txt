@@ -4,6 +4,8 @@ add_library(cycle_perfect_gameboy
   cpu/cpu.cpp
   cartridge/rom.cpp
   system/gameboy.cpp
+  system/timer.cpp
+  system/interrupt_controller.cpp
 )
 
 add_library(cycle_perfect_gameboy::cycle_perfect_gameboy ALIAS cycle_perfect_gameboy)

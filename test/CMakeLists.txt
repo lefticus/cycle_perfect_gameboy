@@ -34,6 +34,8 @@ add_executable(tests
   tests.cpp
   core_types_test.cpp
   integration_blargg_test.cpp
+  cpu_load_instructions_test.cpp
+  load_instruction_debug_test.cpp
 )
 target_link_libraries(
   tests

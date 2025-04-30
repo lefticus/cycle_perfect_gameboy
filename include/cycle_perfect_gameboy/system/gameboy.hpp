@@ -226,7 +226,7 @@ public:
       serial_buffer_.push(data);
       
       // Reset transfer flag to indicate completion
-      memory_map_.write(SC_ADDR, sc_value & ~0x80);
+      memory_map_.write(SC_ADDR, static_cast<std::uint8_t>(sc_value & 0x7F));
     }
   }
   

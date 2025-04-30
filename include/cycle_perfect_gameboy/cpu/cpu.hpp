@@ -64,30 +64,40 @@ public:
     }
     
     // Read opcode at PC
-    const auto pc = registers_.pc_.to_address();
+    auto pc = registers_.pc_.to_address();
     const auto opcode = memory_.read(pc);
-    
-    // Increment PC
-    registers_.set_pc(registers_.pc_.get() + 1);
     
     // Execute instruction
     if (opcode == 0xCB) {
-      // CB-prefixed instruction
-      memory_.read(registers_.pc_.to_address()); // Read CB opcode but not using it yet
-      registers_.set_pc(registers_.pc_.get() + 1);
+      // CB-prefixed instruction - advance PC past CB prefix
+      registers_.set_pc(core::RegisterPair{static_cast<std::uint16_t>(registers_.pc_.get() + 1)});
+      
+      // CB instruction - placeholder for now
+      // Will need to read the CB opcode later: memory_.read(core::Address{static_cast<std::uint16_t>(pc.value() + 1)})
       
       // Execute CB instruction - placeholder for now
       return core::Cycles{4}; // Default to 4 cycles for now
     } else {
       // Regular instruction
       const auto& instruction = instruction_table[opcode];
+      
       if (instruction.handler) {
-        return instruction.handler(registers_, memory_, pc);
+        // Call the handler with appropriate parameters
+        // Note: PC is now passed by reference and can be modified by handlers
+        const auto cycles = instruction.handler(registers_, mutable_memory_, pc);
+        // Update registers_.pc_ to the value updated by the handler
+        registers_.set_pc(core::RegisterPair{pc.value()});
+        return cycles;
+      } else {
+        // For unimplemented instructions, at least advance PC by the instruction length
+        registers_.set_pc(core::RegisterPair{static_cast<std::uint16_t>(
+            registers_.pc_.get() + instruction.length)});
+        return core::Cycles{4}; // Default to 4 cycles
       }
     }
     
-    // If we get here, it's an unimplemented instruction
-    return core::Cycles{4}; // Default to 4 cycles
+    // Should never reach here
+    return core::Cycles{4};
   }
   
   // Run for a specified number of cycles
