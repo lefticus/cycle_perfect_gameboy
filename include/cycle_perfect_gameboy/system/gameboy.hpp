@@ -12,6 +12,7 @@
 #include <cycle_perfect_gameboy/cartridge/rom.hpp>
 #include <cycle_perfect_gameboy/system/timer.hpp>
 #include <cycle_perfect_gameboy/system/interrupt_controller.hpp>
+#include <cycle_perfect_gameboy/debug/logger.hpp>
 
 namespace cycle_perfect_gameboy::system {
 
@@ -118,6 +119,10 @@ public:
     hram_ = memory::RAM<0x80>{};
     
     powered_on_ = true;
+    
+    // Log reset
+    debug::Logger::info("System reset");
+    debug::Logger::log_cpu_state(cpu_);
   }
   
   void run_frame() {
@@ -194,6 +199,9 @@ public:
     if (!powered_on_) {
       return core::Cycles{4}; // Return a default cycle count
     }
+    
+    // Log CPU state before execution
+    debug::Logger::log_cpu_state(cpu_);
     
     // Execute a single instruction
     const auto cycles = cpu_.execute_instruction();
